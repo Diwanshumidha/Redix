@@ -80,7 +80,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Package
-        run: pnpm package
+        run: pnpm exec electron-vite build && pnpm exec electron-builder --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
