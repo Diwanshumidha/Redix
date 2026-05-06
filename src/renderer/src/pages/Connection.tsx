@@ -234,7 +234,8 @@ export default function ConnectionPage() {
   const [toast,       setToast]       = useState<string | null>(null)
 
   /* Recent keys */
-  const { recentKeys, addRecent } = useRecentKeys()
+  // TODO: Implement recent keys 
+  const { addRecent } = useRecentKeys()
 
   /* Data */
   const scanQ   = useKeyScan(id, pattern, scanCount)
