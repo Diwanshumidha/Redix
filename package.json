@@ -75,7 +75,7 @@
     ]
   },
   "build": {
-    "appId": "io.codedecoders.redix",
+    "appId": "io.diwanshu.redix",
     "productName": "Redix",
     "directories": {
       "output": "dist"

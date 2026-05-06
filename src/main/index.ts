@@ -4,7 +4,7 @@ import { createWindow } from './window'
 import { registerIpcHandlers } from './ipc'
 
 app.whenReady().then(() => {
-  app.setAppUserModelId('io.codedecoders.redix')
+  app.setAppUserModelId('io.diwanshu.redix')
 
   initDb()
   registerIpcHandlers()
