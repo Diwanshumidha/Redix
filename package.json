@@ -1,8 +1,8 @@
 {
   "name": "redix",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Redis Insights Desktop — a modern Redis GUI",
-   "main": "out/main/index.js",
+  "main": "out/main/index.js",
   "author": {
     "name": "Diwanshu Midha",
     "email": "saidiwanshu1880@gmail.com"
