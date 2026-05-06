@@ -8,6 +8,20 @@
 
 ### Features
 
+* change app id ([f4b6b5a](https://github.com/Diwanshumidha/Redix/commit/f4b6b5a5eb187f68c13e7bbeaca0c1e6ab0c16bf))
+* force run build ([4ac871f](https://github.com/Diwanshumidha/Redix/commit/4ac871f43d0ece370dc19360132c3ac6bdd99c44))
+* update packaging step to use electron-vite and electron-builder ([5e5353e](https://github.com/Diwanshumidha/Redix/commit/5e5353e89027897b73ce1c0d9cf92dd4f68317e3))
+
+# [1.2.0](https://github.com/Diwanshumidha/Redix/compare/v1.1.1...v1.2.0) (2026-05-06)
+
+
+### Bug Fixes
+
+* remove support for mac ([72f824f](https://github.com/Diwanshumidha/Redix/commit/72f824f064b2f3f92086707dfb1cd3e5804327f0))
+
+
+### Features
+
 * force run build ([4ac871f](https://github.com/Diwanshumidha/Redix/commit/4ac871f43d0ece370dc19360132c3ac6bdd99c44))
 * update packaging step to use electron-vite and electron-builder ([5e5353e](https://github.com/Diwanshumidha/Redix/commit/5e5353e89027897b73ce1c0d9cf92dd4f68317e3))
 
