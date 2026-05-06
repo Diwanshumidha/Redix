@@ -91,4 +91,7 @@ export interface ElectronAPI {
     dbSize:  (connectionId: string) => Promise<IpcResult<number>>
     flushDb: (connectionId: string) => Promise<IpcResult>
   }
+  app: {
+    version: () => Promise<string>
+  }
 }

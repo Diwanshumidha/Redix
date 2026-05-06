@@ -55,6 +55,9 @@ const api: ElectronAPI = {
     dbSize:  (cid) => invoke(CH.SRV_DBSIZE, cid),
     flushDb: (cid) => invoke(CH.SRV_FLUSH,  cid),
   },
+  app: {
+    version: () => invoke(CH.APP_VERSION),
+  },
 }
 
 contextBridge.exposeInMainWorld('electron', api)

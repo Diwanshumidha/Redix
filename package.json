@@ -17,7 +17,9 @@
     "package:win": "electron-vite build && electron-builder --win",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
-    "postinstall": "electron-rebuild -f -w better-sqlite3"
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "prepare": "husky",
+    "release": "semantic-release"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
@@ -57,7 +59,13 @@
     "tailwindcss": "^4.1.5",
     "typescript": "^5.8.3",
     "vite": "^6.3.4",
-    "zustand": "^5.0.4"
+    "zustand": "^5.0.4",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7",
+    "semantic-release": "^24.2.5",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

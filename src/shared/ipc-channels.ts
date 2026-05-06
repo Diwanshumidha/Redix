@@ -51,4 +51,7 @@ export const CH = {
   SRV_INFO:     'server:info',
   SRV_DBSIZE:   'server:dbSize',
   SRV_FLUSH:    'server:flushDb',
+
+  // App
+  APP_VERSION:  'app:version',
 } as const
