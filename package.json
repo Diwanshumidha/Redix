@@ -1,6 +1,6 @@
 {
   "name": "redix",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Redis Insights Desktop — a modern Redis GUI",
   "main": "out/main/index.js",
   "author": {

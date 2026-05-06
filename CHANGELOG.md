@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Diwanshumidha/Redix/compare/v1.0.0...v1.1.0) (2026-05-06)
+
+
+### Features
+
+* package ci ([138d721](https://github.com/Diwanshumidha/Redix/commit/138d72162ee3cbdf1f4d67f10f0bed9ce44d92e0))
+
 # 1.0.0 (2026-05-06)
 
 
