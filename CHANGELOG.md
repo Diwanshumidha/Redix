@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/Diwanshumidha/Redix/compare/v1.1.0...v1.1.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* release ci ([2042d42](https://github.com/Diwanshumidha/Redix/commit/2042d4222ebcf21d6b21a18321b7dead12d52a16))
+
 # [1.1.0](https://github.com/Diwanshumidha/Redix/compare/v1.0.0...v1.1.0) (2026-05-06)
 
 
