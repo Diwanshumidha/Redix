@@ -89,11 +89,6 @@
         "deb"
       ]
     },
-    "mac": {
-      "target": [
-        "dmg"
-      ]
-    },
     "win": {
       "target": [
         "nsis"

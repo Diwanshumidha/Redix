@@ -56,10 +56,10 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
+            args: '--linux'
             artifact: 'dist/*.AppImage dist/*.deb'
-          - os: macos-latest
-            artifact: 'dist/*.dmg'
           - os: windows-latest
+            args: '--win'
             artifact: 'dist/*.exe'
 
     steps:
@@ -76,11 +76,15 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Install Linux build dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Package
-        run: pnpm exec electron-vite build && pnpm exec electron-builder --publish never
+        run: pnpm exec electron-vite build && pnpm exec electron-builder ${{ matrix.args }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
