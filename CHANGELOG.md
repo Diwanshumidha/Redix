@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/Diwanshumidha/Redix/compare/v1.2.1...v1.2.2) (2026-05-07)
+
+
+### Bug Fixes
+
+* file issue in the cd ubuntu ([8ad7d02](https://github.com/Diwanshumidha/Redix/commit/8ad7d026ec66d856d435a1217b148c0e11de8522))
+
 ## [1.2.1](https://github.com/Diwanshumidha/Redix/compare/v1.2.0...v1.2.1) (2026-05-07)
 
 
