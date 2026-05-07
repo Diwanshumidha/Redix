@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/Diwanshumidha/Redix/compare/v1.2.0...v1.2.1) (2026-05-07)
+
+
+### Bug Fixes
+
+* the ci/cd pipeline 2 ([f936ba8](https://github.com/Diwanshumidha/Redix/commit/f936ba8735c0f8318f08b2d337d2d0b6ef72cb6e))
+
 # [1.2.0](https://github.com/Diwanshumidha/Redix/compare/v1.1.1...v1.2.0) (2026-05-07)
 
 
