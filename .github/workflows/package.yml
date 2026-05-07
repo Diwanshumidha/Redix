@@ -20,7 +20,9 @@ jobs:
         include:
           - os: ubuntu-latest
             args: --linux
-            artifacts: "dist/*.AppImage dist/*.deb"
+            artifacts: |
+              dist/*.AppImage
+              dist/*.deb
 
           - os: windows-latest
             args: --win
@@ -59,11 +61,6 @@ jobs:
         run: pnpm exec electron-builder ${{ matrix.args }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
-
-      - name: Debug dist
-        run: |
-          echo "=== DIST ==="
-          find dist || dir dist
 
       - name: Upload assets
         uses: softprops/action-gh-release@v2
