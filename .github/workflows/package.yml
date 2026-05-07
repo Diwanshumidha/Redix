@@ -1,15 +1,18 @@
 name: Package
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
 
 permissions:
   contents: write
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     strategy:
       fail-fast: false
 
@@ -26,7 +29,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -46,20 +52,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build application
+      - name: Build app
         run: pnpm build
 
-      - name: Package binaries
+      - name: Package app
         run: pnpm exec electron-builder ${{ matrix.args }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Debug artifacts
+      - name: Debug dist
         run: |
           echo "=== DIST ==="
-          find dist
+          find dist || dir dist
 
-      - name: Upload release assets
+      - name: Upload assets
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ github.event.workflow_run.run_number }}
           files: ${{ matrix.artifacts }}
