@@ -1,21 +1,25 @@
-name: CI
+name: Release
 
 on:
   push:
-    branches: [master]
-    paths-ignore:
-      - 'CHANGELOG.md'
-      - 'package.json'
-  pull_request:
-    branches: [master]
+    branches:
+      - master
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
-  typecheck:
-    name: Typecheck
+  release:
     runs-on: ubuntu-latest
 
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         with:
@@ -29,43 +33,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type-check (main)
-        run: pnpm exec tsc --noEmit -p tsconfig.node.json
-
-      - name: Type-check (renderer)
-        run: pnpm exec tsc --noEmit -p tsconfig.web.json
-
-  build:
-    name: Build (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    needs: typecheck
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build (Vite only, no packaging)
-        run: pnpm build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: out-${{ matrix.os }}
-          path: out/
-          retention-days: 7
+      - name: Release
+        uses: cycjimmy/semantic-release-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

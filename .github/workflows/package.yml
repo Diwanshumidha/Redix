@@ -4,35 +4,29 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag to build (e.g. v1.2.0)'
-        required: true
+
+permissions:
+  contents: write
 
 jobs:
-  package:
-    name: Package (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-
-    permissions:
-      contents: write
-
+  build:
     strategy:
       fail-fast: false
+
       matrix:
         include:
           - os: ubuntu-latest
-            args: '--linux'
-            artifact: 'dist/*.AppImage dist/*.deb'
+            args: --linux
+            artifacts: "dist/*.AppImage dist/*.deb"
+
           - os: windows-latest
-            args: '--win'
-            artifact: 'dist/*.exe'
+            args: --win
+            artifacts: "dist/*.exe"
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -43,31 +37,29 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Install Linux build dependencies
+      - name: Install Linux dependencies
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fakeroot dpkg rpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Package
-        run: pnpm exec electron-vite build && pnpm exec electron-builder ${{ matrix.args }} --publish never
+      - name: Build application
+        run: pnpm build
+
+      - name: Package binaries
+        run: pnpm exec electron-builder ${{ matrix.args }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Debug output files
+      - name: Debug artifacts
         run: |
           echo "=== DIST ==="
-          ls -R dist || true
+          find dist
 
-          echo "=== RELEASE ==="
-          ls -R release || true
-
-          echo "=== ROOT ==="
-          ls
-
-      - name: Upload installers to release
+      - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          files: ${{ matrix.artifact }}
+          files: ${{ matrix.artifacts }}
