@@ -23,6 +23,7 @@ export const CH = {
   KEYS_TTL:     'keys:ttl',
   KEYS_EXPIRE:  'keys:expire',
   KEYS_PERSIST: 'keys:persist',
+  KEYS_RENAME:  'keys:rename',
 
   // Value operations per type
   STR_GET:      'string:get',
@@ -35,6 +36,7 @@ export const CH = {
   LIST_RANGE:   'list:range',
   LIST_PUSH:    'list:push',
   LIST_SET:     'list:set',
+  LIST_REM:     'list:rem',
 
   SET_MEMBERS:  'set:members',
   SET_ADD:      'set:add',

@@ -19,9 +19,10 @@ const api: ElectronAPI = {
     scan:    (cid, pat, cur, n) => invoke(CH.KEYS_SCAN,    cid, pat, cur, n),
     type:    (cid, key)         => invoke(CH.KEYS_TYPE,    cid, key),
     delete:  (cid, keys)        => invoke(CH.KEYS_DELETE,  cid, keys),
-    ttl:     (cid, key)         => invoke(CH.KEYS_TTL,     cid, key),
-    expire:  (cid, key, s)      => invoke(CH.KEYS_EXPIRE,  cid, key, s),
-    persist: (cid, key)         => invoke(CH.KEYS_PERSIST, cid, key),
+    ttl:     (cid, key)              => invoke(CH.KEYS_TTL,     cid, key),
+    expire:  (cid, key, s)           => invoke(CH.KEYS_EXPIRE,  cid, key, s),
+    persist: (cid, key)              => invoke(CH.KEYS_PERSIST, cid, key),
+    rename:  (cid, oldKey, newKey)   => invoke(CH.KEYS_RENAME,  cid, oldKey, newKey),
   },
   string: {
     get: (cid, key)          => invoke(CH.STR_GET, cid, key),
@@ -36,6 +37,7 @@ const api: ElectronAPI = {
     range: (cid, key, s, e)    => invoke(CH.LIST_RANGE, cid, key, s, e),
     push:  (cid, key, val, sd) => invoke(CH.LIST_PUSH,  cid, key, val, sd),
     set:   (cid, key, i, val)  => invoke(CH.LIST_SET,   cid, key, i, val),
+    rem:   (cid, key, i)       => invoke(CH.LIST_REM,   cid, key, i),
   },
   set: {
     members: (cid, key)      => invoke(CH.SET_MEMBERS, cid, key),

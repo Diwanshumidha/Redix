@@ -17,9 +17,10 @@ export function registerKeyHandlers(): void {
     return { keys: keyInfos, cursor: nextCursor } satisfies ScanResult
   })
 
-  withClient(CH.KEYS_TYPE,    (client, key)           => resolveKeyInfo(client, key as string))
-  withClient(CH.KEYS_DELETE,  (client, keys)           => client.del(...(keys as string[])))
-  withClient(CH.KEYS_TTL,     (client, key)            => client.ttl(key as string))
-  withClient(CH.KEYS_EXPIRE,  (client, key, seconds)   => client.expire(key as string, seconds as number))
-  withClient(CH.KEYS_PERSIST, (client, key)            => client.persist(key as string))
+  withClient(CH.KEYS_TYPE,    (client, key)             => resolveKeyInfo(client, key as string))
+  withClient(CH.KEYS_DELETE,  (client, keys)             => client.del(...(keys as string[])))
+  withClient(CH.KEYS_TTL,     (client, key)              => client.ttl(key as string))
+  withClient(CH.KEYS_EXPIRE,  (client, key, seconds)     => client.expire(key as string, seconds as number))
+  withClient(CH.KEYS_PERSIST, (client, key)              => client.persist(key as string))
+  withClient(CH.KEYS_RENAME,  (client, oldKey, newKey)   => client.rename(oldKey as string, newKey as string))
 }

@@ -18,6 +18,11 @@ export function registerValueHandlers(): void {
   // ── List ─────────────────────────────────────────────────────────────────
   withClient(CH.LIST_RANGE, (client, key, start, stop)  => client.lrange(key as string, start as number, stop as number))
   withClient(CH.LIST_SET,   (client, key, index, value) => client.lset(key as string, index as number, value as string))
+  withClient(CH.LIST_REM,   async (client, key, index) => {
+    const sentinel = `\x00__rem_${Date.now()}__\x00`
+    await client.lset(key as string, index as number, sentinel)
+    return client.lrem(key as string, 1, sentinel)
+  })
   withClient(CH.LIST_PUSH,  (client, key, value, side)  =>
     side === 'left'
       ? client.lpush(key as string, value as string)

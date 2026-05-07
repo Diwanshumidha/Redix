@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback, memo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { RefreshCw, Terminal, Copy, Trash2, Clock, Server } from 'lucide-react'
+import { RefreshCw, Terminal, Copy, Trash2, Clock, Server, Pencil } from 'lucide-react'
 import { useConnectionsStore } from '../store/connections'
 import {
   useKeyScan, useKeyInfo, useKeyValue, useDbSize,
@@ -14,6 +14,8 @@ import PrefixTree from '../components/redis/PrefixTree'
 import CommandPalette from '../components/ui/CommandPalette'
 import CliDrawer from '../components/ui/CliDrawer'
 import { ConfirmModal, PromptModal } from '../components/ui/RvModals'
+import EditKeyModal from '../components/redis/EditKeyModal'
+import CreateKeyModal from '../components/redis/CreateKeyModal'
 
 const ALL_TYPES = ['string', 'hash', 'list', 'set', 'zset'] as const
 
@@ -105,7 +107,7 @@ const DetailHeader = memo(function DetailHeader({
 }: {
   connectionId: string
   keyName:      string
-  onAction:     (action: 'delete' | 'expire' | 'rename' | 'refresh') => void
+  onAction:     (action: 'delete' | 'expire' | 'rename' | 'refresh' | 'edit') => void
   onCopy:       (text: string) => void
 }) {
   const infoQ  = useKeyInfo(connectionId, keyName)
@@ -143,6 +145,11 @@ const DetailHeader = memo(function DetailHeader({
           <button className={`rv-btn icon-btn${copied ? ' copied' : ''}`} title="Copy as JSON" onClick={handleCopy}>
             <Copy size={12} />
           </button>
+          {['string', 'hash', 'list', 'set', 'zset'].includes(info.type) && (
+            <button className="rv-btn icon-btn" title="Edit value" onClick={() => onAction('edit')}>
+              <Pencil size={12} />
+            </button>
+          )}
           <button className="rv-btn icon-btn" title="Set TTL / Expire" onClick={() => onAction('expire')}>
             <Clock size={12} />
           </button>
@@ -231,11 +238,12 @@ export default function ConnectionPage() {
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [cliOpen,     setCliOpen]     = useState(false)
   const [modal,       setModal]       = useState<ModalState | null>(null)
+  const [editOpen,    setEditOpen]    = useState(false)
+  const [createOpen,  setCreateOpen]  = useState(false)
   const [toast,       setToast]       = useState<string | null>(null)
 
   /* Recent keys */
-  // TODO: Implement recent keys 
-  const { addRecent } = useRecentKeys()
+  const { recentKeys, addRecent } = useRecentKeys()
 
   /* Data */
   const scanQ   = useKeyScan(id, pattern, scanCount)
@@ -325,7 +333,7 @@ export default function ConnectionPage() {
   }, [visibleKeys, activeTabKey, handleSelectKey])
 
   /* Key actions — any action pins the active tab */
-  const handleKeyAction = useCallback(async (action: 'delete' | 'expire' | 'rename' | 'refresh') => {
+  const handleKeyAction = useCallback(async (action: 'delete' | 'expire' | 'rename' | 'refresh' | 'edit') => {
     if (!activeTabKey) return
     pinTab(activeTabKey)
     if (action === 'delete') {
@@ -336,6 +344,8 @@ export default function ConnectionPage() {
       setModal({ kind: 'rename', key: activeTabKey })
     } else if (action === 'refresh') {
       invalidateKey(id, activeTabKey)
+    } else if (action === 'edit') {
+      setEditOpen(true)
     }
   }, [activeTabKey, id, invalidateKey])
 
@@ -358,6 +368,19 @@ export default function ConnectionPage() {
     invalidateKey(id, modal.key)
     setModal(null)
     showToast(n === 0 ? 'TTL cleared' : `TTL set to ${n}s`)
+  }
+
+  const confirmRename = async (newName: string) => {
+    if (!modal) return
+    const trimmed = newName.trim()
+    if (!trimmed || trimmed === modal.key) { setModal(null); return }
+    const r = await ipc.keys.rename(id, modal.key, trimmed)
+    if (!r.ok) { showToast(`Rename failed: ${r.error}`); setModal(null); return }
+    setOpenTabs((prev) => prev.map((t) => t.key === modal.key ? { ...t, key: trimmed } : t))
+    if (activeTabKey === modal.key) setActiveTabKey(trimmed)
+    invalidateScan(id)
+    setModal(null)
+    showToast(`Renamed to ${trimmed}`)
   }
 
   const handlePaletteAction = (action: string) => {
@@ -443,8 +466,15 @@ export default function ConnectionPage() {
               + more
             </button>
           )}
-
-          <div className="rv-view-toggle">
+          <button
+            className="rv-btn ghost"
+            style={{ height: 20, padding: '0 8px', fontSize: 10, marginLeft: 'auto' }}
+            onClick={() => setCreateOpen(true)}
+            title="Create new key"
+          >
+            + New
+          </button>
+          <div className="rv-view-toggle" style={{ marginLeft: 0 }}>
             <button className={view === 'flat' ? 'on' : ''} onClick={() => setView('flat')}>List</button>
             <button className={view === 'tree' ? 'on' : ''} onClick={() => setView('tree')}>Tree</button>
           </div>
@@ -537,7 +567,12 @@ export default function ConnectionPage() {
             <DetailBody connectionId={id} keyName={activeTabKey} />
           </div>
         ) : (
-          <div className="rv-detail-empty">
+          <div
+            className="rv-detail-empty"
+            style={recentKeys.length > 0
+              ? { justifyContent: 'flex-start', paddingTop: '8vh', paddingBottom: 24, overflowY: 'auto' }
+              : undefined}
+          >
             <div className="glyph">⌘</div>
             <div style={{ color: 'var(--rv-text-2)', fontWeight: 500, fontSize: 13 }}>Select a key to inspect</div>
             <div style={{ fontSize: 11, color: 'var(--rv-text-3)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -549,6 +584,41 @@ export default function ConnectionPage() {
               <span style={{ color: 'var(--rv-border-strong)' }}>·</span>
               <span><kbd>⌘`</kbd> CLI</span>
             </div>
+
+            {recentKeys.length > 0 && (
+              <div style={{ marginTop: 32, width: '100%', maxWidth: 400, textAlign: 'left' }}>
+                <div style={{
+                  fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
+                  textTransform: 'uppercase', color: 'var(--rv-text-3)',
+                  fontFamily: 'var(--rv-mono)', marginBottom: 8, paddingLeft: 2,
+                }}>
+                  Recently opened
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {recentKeys.map(({ key, type }) => (
+                    <button
+                      key={key}
+                      onClick={() => handleDoubleClickKey(key)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '7px 12px', borderRadius: 6, textAlign: 'left',
+                        background: 'var(--rv-bg-1)', border: '1px solid var(--rv-border)',
+                        color: 'var(--rv-text-1)', cursor: 'pointer',
+                        fontFamily: 'var(--rv-mono)', fontSize: 11.5,
+                        transition: 'all 0.1s', width: '100%',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--rv-bg-2)'; e.currentTarget.style.borderColor = 'var(--rv-border-strong)'; e.currentTarget.style.color = 'var(--rv-text-0)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--rv-bg-1)'; e.currentTarget.style.borderColor = 'var(--rv-border)'; e.currentTarget.style.color = 'var(--rv-text-1)' }}
+                    >
+                      <span className="rv-ktype" data-t={type} style={{ flexShrink: 0 }}>{type}</span>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {key}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -612,6 +682,35 @@ export default function ConnectionPage() {
         placeholder="3600"
         onSubmit={confirmExpire}
         onCancel={() => setModal(null)}
+      />
+
+      <PromptModal
+        open={modal?.kind === 'rename'}
+        title="Rename key"
+        label="New key name"
+        defaultValue={modal?.key ?? ''}
+        onSubmit={confirmRename}
+        onCancel={() => setModal(null)}
+      />
+
+      <CreateKeyModal
+        open={createOpen}
+        connectionId={id}
+        onClose={() => setCreateOpen(false)}
+        onCreated={(key, type) => {
+          invalidateScan(id)
+          handleDoubleClickKey(key)
+          showToast(`Created ${type} key`)
+        }}
+      />
+
+      <EditKeyModal
+        open={editOpen}
+        connectionId={id}
+        keyName={activeTabKey ?? ''}
+        keyType={openTabs.find((t) => t.key === activeTabKey)?.type ?? ''}
+        onClose={() => setEditOpen(false)}
+        onSaved={() => { if (activeTabKey) invalidateKey(id, activeTabKey) }}
       />
 
       {toast && <div className="rv-toast">{toast}</div>}

@@ -58,6 +58,7 @@ export interface ElectronAPI {
     ttl:     (connectionId: string, key: string)                                    => Promise<IpcResult<number>>
     expire:  (connectionId: string, key: string, seconds: number)                   => Promise<IpcResult>
     persist: (connectionId: string, key: string)                                    => Promise<IpcResult>
+    rename:  (connectionId: string, oldKey: string, newKey: string)                 => Promise<IpcResult>
   }
   string: {
     get: (connectionId: string, key: string)                           => Promise<IpcResult<string>>
@@ -72,6 +73,7 @@ export interface ElectronAPI {
     range: (connectionId: string, key: string, start: number, stop: number)           => Promise<IpcResult<string[]>>
     push:  (connectionId: string, key: string, value: string, side: 'left' | 'right') => Promise<IpcResult>
     set:   (connectionId: string, key: string, index: number, value: string)          => Promise<IpcResult>
+    rem:   (connectionId: string, key: string, index: number)                         => Promise<IpcResult>
   }
   set: {
     members: (connectionId: string, key: string)                  => Promise<IpcResult<string[]>>
