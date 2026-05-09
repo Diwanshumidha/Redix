@@ -1,5 +1,13 @@
-import { BrowserWindow } from 'electron'
-import { join } from 'path'
+import { app, BrowserWindow, nativeImage } from 'electron'
+import { join } from 'node:path'
+
+function resolveIcon() {
+  if (process.platform !== 'linux') return undefined
+  const iconPath = app.isPackaged
+    ? join(process.resourcesPath, 'icons', '512x512.png')
+    : join(__dirname, '../../assets/icons/512x512.png')
+  return nativeImage.createFromPath(iconPath)
+}
 
 export function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -12,6 +20,7 @@ export function createWindow(): BrowserWindow {
     titleBarStyle: 'hidden',
     trafficLightPosition: { x: 16, y: 16 },
     backgroundColor: '#1E1E2E',
+    icon: resolveIcon(),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
